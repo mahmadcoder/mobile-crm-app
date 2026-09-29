@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LoopAI CRM - Clean, Modern Lead Management and Conversion Engine for Mobile App Development Agencies. Features Meta CAPI multi-account sync, Google Ads Offline Conversions, and intelligent duplicate filtering.">
+  <title>LoopAI CRM | Mobile App Agency Lead & Conversion Pipeline</title>
+  
+  <!-- Modern Clean Typography (Inter + Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- App Shell Layout (Left Sidebar + Main Stage) -->
+  <div class="app-wrapper">
+    <!-- LEFT SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-group">
+          <div class="brand-icon">
+            <i class="fa-solid fa-shapes"></i>
+          </div>
+          <div class="brand-title">
+            LoopAI <span class="brand-badge">CRM</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">CORE PIPELINE</div>
+        <button class="nav-link active" id="navKanban" onclick="switchView('kanban')">
+          <i class="fa-solid fa-table-columns"></i>
+          <span>Lead Pipeline</span>
+        </button>
+        <button class="nav-link" id="navTable" onclick="switchView('table')">
+          <i class="fa-solid fa-list-check"></i>
+          <span>All Inquiries</span>
+          <span class="nav-badge nav-badge-green" id="sidebarTotalBadge">142</span>
+        </button>
+        <button class="nav-link" id="navShield" onclick="switchView('shield')">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Ad Algorithm Shield</span>
+        </button>
+
+        <div class="nav-section-title" style="margin-top: 1rem;">INTEGRATIONS</div>
+        <button class="nav-link" onclick="openModal('integrationsModal')">
+          <i class="fa-brands fa-meta" style="color: #4f46e5;"></i>
+          <span>Meta CAPI (3 Accts)</span>
+        </button>
+        <button class="nav-link" onclick="openModal('integrationsModal')">
+          <i class="fa-brands fa-google" style="color: #ea4335;"></i>
+          <span>Google Offline API</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-shield-box">
+          <i class="fa-solid fa-shield-check"></i>
+          <div>
+            <strong>Ad Shield: Active</strong>
+            <div style="font-size: 0.68rem; opacity: 0.9;">Junk leads blocked from CAPI</div>
+          </div>
+        </div>
+
+        <div class="user-profile-row">
+          <div class="user-avatar-group">
+            <div class="user-avatar" id="sidebarAvatar">SA</div>
+            <div class="user-details">
+              <span class="user-name" id="sidebarUserName">Super Admin</span>
+              <select id="userRoleSelect" class="user-role-select" onchange="switchRole(this.value)">
+                <option value="admin">Super Admin</option>
+                <option value="manager">Manager (Fahad)</option>
+                <option value="agent">Agent (Ali)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN STAGE -->
+    <main class="main-stage">
+      <!-- Top App Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 class="page-title">Mobile App Development Leads</h1>
+          <p class="page-subtitle">Inbound inquiries from Website, Meta Ads & Google Ads with CAPI conversion feedback.</p>
+        </div>
+
+        <div class="header-right">
+          <!-- Simulation Dropdown for Demo -->
+          <div class="dropdown">
+            <button class="btn btn-sim" id="simDropdownBtn" onclick="toggleSimMenu()">
+              <i class="fa-solid fa-bolt"></i>
+              <span>Simulate Lead</span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+            </button>
+            <div class="sim-menu" id="simMenu">
+              <div class="dropdown-header">DEMO SCENARIOS FOR CLIENT PRESENTATION</div>
+              <button class="sim-item" onclick="triggerPreset('meta_high_ticket')">
+                <span class="sim-badge meta"><i class="fa-brands fa-meta"></i> Meta Ads</span>
+                <div class="sim-info">
+                  <strong>High-Ticket App Founder ($18k)</strong>
+                  <span>Ride-Hailing iOS/Android App</span>
+                </div>
+              </button>
+              <button class="sim-item" onclick="triggerPreset('google_ads_lead')">
+                <span class="sim-badge google"><i class="fa-brands fa-google"></i> Google</span>
+                <div class="sim-info">
+                  <strong>Google Search Lead ($20k+ gclid)</strong>
+                  <span>Telemedicine Video Consult App</span>
+                </div>
+              </button>
+              <button class="sim-item" onclick="triggerPreset('junk_lead')">
+                <span class="sim-badge junk"><i class="fa-solid fa-ban"></i> Junk Lead</span>
+                <div class="sim-info">
+                  <strong>"Free me app bana do" (500 PKR)</strong>
+                  <span>Auto-Blocked from CAPI</span>
+                </div>
+              </button>
+              <button class="sim-item" onclick="triggerPreset('duplicate_test')">
+                <span class="sim-badge dup"><i class="fa-solid fa-clone"></i> Duplicate</span>
+                <div class="sim-info">
+                  <strong>Duplicate Phone Number Test</strong>
+                  <span>Merged into existing client history</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn btn-white" onclick="openModal('integrationsModal')">
+            <i class="fa-solid fa-satellite-dish" style="color: #6366f1;"></i>
+            <span>CAPI Status</span>
+          </button>
+
+          <button class="btn btn-primary" onclick="openModal('newLeadModal')">
+            <i class="fa-solid fa-plus"></i>
+            <span>New Lead</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Stage Body Content -->
+      <div class="stage-body">
+        <!-- 4 Clean LoopAI Metric Cards -->
+        <section class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-title">TOTAL INBOUND LEADS</span>
+              <div class="metric-icon-wrap icon-blue">
+                <i class="fa-solid fa-inbox"></i>
+              </div>
+            </div>
+            <div class="metric-value-row">
+              <span class="metric-val" id="statTotalLeads">--</span>
+              <span class="metric-badge badge-blue">3 Channels</span>
+            </div>
+            <div class="metric-sub">Website, Meta & Google Ads</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-title">APP BUDGET FIT RATE</span>
+              <div class="metric-icon-wrap icon-green">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+            </div>
+            <div class="metric-value-row">
+              <span class="metric-val" id="statQualityRate">--%</span>
+              <span class="metric-badge badge-green"><i class="fa-solid fa-arrow-trend-up"></i> High Value</span>
+            </div>
+            <div class="metric-sub">Verified $10,000+ app projects</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-title">JUNK LEADS BLOCKED (SHIELD)</span>
+              <div class="metric-icon-wrap icon-red">
+                <i class="fa-solid fa-shield-virus"></i>
+              </div>
+            </div>
+            <div class="metric-value-row">
+              <span class="metric-val" id="statJunkBlocked" style="color: #d92d20;">--</span>
+              <span class="metric-badge badge-red">Ad Spend Saved</span>
+            </div>
+            <div class="metric-sub">0 conversion sent to Meta/Google</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-title">META CAPI & GOOGLE OFFLINE</span>
+              <div class="metric-icon-wrap icon-purple">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+            </div>
+            <div class="metric-value-row">
+              <span class="metric-val" style="color: #6941c6;">3 / 3</span>
+              <span class="metric-badge badge-purple">Live API</span>
+            </div>
+            <div class="metric-sub">Synced across primary & retargeting pixels</div>
+          </div>
+        </section>
+
+        <!-- Controls Toolbar (View Switcher + Search + Filters) -->
+        <section class="controls-bar">
+          <div class="view-pills">
+            <button class="view-btn active" id="tabKanban" onclick="switchView('kanban')">
+              <i class="fa-solid fa-table-columns"></i>
+              <span>Pipeline</span>
+            </button>
+            <button class="view-btn" id="tabTable" onclick="switchView('table')">
+              <i class="fa-solid fa-list"></i>
+              <span>List Grid</span>
+            </button>
+            <button class="view-btn" id="tabShield" onclick="switchView('shield')">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Junk Shield Audit</span>
+            </button>
+          </div>
+
+          <div class="filters-row">
+            <div class="search-field">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchInput" placeholder="Search app leads, client, phone..." oninput="handleSearch(this.value)">
+              <button id="searchClearBtn" onclick="clearSearch()" style="display: none; background: transparent; border: none; cursor: pointer; color: var(--text-tertiary);">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <select id="sourceFilter" class="select-filter" onchange="applyFilters()">
+              <option value="all">All Lead Sources</option>
+              <option value="Meta Ads">Meta Lead Ads</option>
+              <option value="Google Ads">Google Ads</option>
+              <option value="Website">Website Form</option>
+            </select>
+
+            <select id="qualityFilter" class="select-filter" onchange="applyFilters()">
+              <option value="all">All Intent Tiers</option>
+              <option value="high">High Intent ($10k+)</option>
+              <option value="medium">Medium Intent</option>
+              <option value="junk">Junk / Shielded</option>
+            </select>
+
+            <select id="agentFilter" class="select-filter" onchange="applyFilters()">
+              <option value="all">All Team Members</option>
+              <option value="Ali">Ali (Senior Agent)</option>
+              <option value="Sara">Sara (Sales Lead)</option>
+              <option value="Hamza">Hamza (Consultant)</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Role Banner Notification -->
+        <div id="roleContextBanner" style="display: none; background: #eef2ff; border: 1px solid #c7d2fe; color: #4338ca; padding: 0.6rem 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.82rem; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-circle-info"></i>
+          <span id="roleContextText">Viewing as Agent Ali</span>
+        </div>
+
+        <!-- VIEW 1: KANBAN PIPELINE -->
+        <section id="kanbanView" class="kanban-scroll">
+          <div class="kanban-grid" id="kanbanBoard">
+            <!-- Rendered by app.js -->
+          </div>
+        </section>
+
+        <!-- VIEW 2: TABLE VIEW -->
+        <section id="tableView" class="table-panel" style="display: none;">
+          <div class="table-panel-header">
+            <span class="table-panel-title"><i class="fa-solid fa-table-list" style="margin-right: 0.4rem; color: #6366f1;"></i> All Inbound Lead Records</span>
+            <span style="font-size: 0.78rem; color: var(--text-muted);" id="tableCountBadge">Loading...</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="clean-table" id="leadsTable">
+              <thead>
+                <tr>
+                  <th>Client / App Project</th>
+                  <th>App Platform & Scope</th>
+                  <th>Budget</th>
+                  <th>Source</th>
+                  <th>Intent Tier</th>
+                  <th>Pipeline Stage</th>
+                  <th>Meta CAPI</th>
+                  <th>Google Offline</th>
+                  <th>Agent</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <!-- Rendered by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW 3: JUNK SHIELD AUDIT -->
+        <section id="shieldView" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.25rem;">
+            <div class="table-panel" style="padding: 1.5rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #d92d20; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-shield-halved"></i> How This CRM Protects Your Ad Budget & Algorithm
+              </h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                Meta Ads aur Google Ads me sabse bara nuksaan yeh hota hai ke jab koi fake ya 500 PKR wala user form fill karta hai, ad networks usko "Lead Conversion" samajh kar aur zyada junk logon ko ads dikhana shuru kar dete hain.
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="background: #f8f9fb; border: 1px solid var(--border-light); padding: 0.85rem; border-radius: 8px;">
+                  <strong style="font-size: 0.82rem; color: #101828; display: block; margin-bottom: 0.2rem;"><i class="fa-solid fa-check text-green" style="margin-right: 0.35rem;"></i> Meta CAPI Event Suppression</strong>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Junk leads ko mark karte hi CAPI event automatically cancel ho jata hai. Facebook ko koi positive signal nahi milta.</span>
+                </div>
+                <div style="background: #f8f9fb; border: 1px solid var(--border-light); padding: 0.85rem; border-radius: 8px;">
+                  <strong style="font-size: 0.82rem; color: #101828; display: block; margin-bottom: 0.2rem;"><i class="fa-solid fa-check text-green" style="margin-right: 0.35rem;"></i> Google Offline Conversion Sync on Stage Change</strong>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Sirf un leads ka <code>gclid</code> Google Ads API ko bhejte hain jo "Qualified" ya "Deal Won" hote hain with actual deal value ($10k - $25k).</span>
+                </div>
+                <div style="background: #f8f9fb; border: 1px solid var(--border-light); padding: 0.85rem; border-radius: 8px;">
+                  <strong style="font-size: 0.82rem; color: #101828; display: block; margin-bottom: 0.2rem;"><i class="fa-solid fa-check text-green" style="margin-right: 0.35rem;"></i> Phone Normalization & Duplicate Alert</strong>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Duplicate inquiries ko timeline me merge kar ke agent ko double calling se bachata hai.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-panel" style="padding: 1.5rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #101828; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-clock-rotate-left" style="color: #6366f1;"></i> Live Conversion & System Activity
+              </h3>
+              <div id="liveActivityFeed" style="display: flex; flex-direction: column; gap: 0.65rem; max-height: 400px; overflow-y: auto;">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= SLIDE-OVER LEAD DRAWER ================= -->
+  <div class="drawer-backdrop" id="drawerOverlay" onclick="closeLeadDrawer()"></div>
+  <aside class="app-drawer" id="leadDrawer">
+    <div class="drawer-top-bar">
+      <div>
+        <span class="drawer-lead-id" id="drawerLeadId">LEAD-XXX</span>
+        <h2 class="drawer-lead-title" id="drawerLeadName">Client Name</h2>
+        <span class="drawer-lead-sub" id="drawerLeadCompany">Company Details</span>
+      </div>
+      <button class="drawer-close-btn" onclick="closeLeadDrawer()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Quick Actions -->
+      <div class="drawer-card">
+        <div class="drawer-quick-actions">
+          <a href="#" id="drawerPhoneBtn" class="btn btn-call-lead"><i class="fa-solid fa-phone"></i> Call Client</a>
+          <a href="#" id="drawerWhatsAppBtn" target="_blank" class="btn btn-whatsapp-lead"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+          
+          <div style="margin-left: auto; display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;">
+            <label style="font-weight: 600; color: var(--text-muted);">Stage:</label>
+            <select id="drawerStageSelect" class="clean-input" style="padding: 0.3rem 0.5rem;" onchange="updateLeadStageFromDrawer(this.value)">
+              <option value="new">New Inquiry</option>
+              <option value="contacted">Contacted & Discovery</option>
+              <option value="qualified">Qualified (Budget Fit)</option>
+              <option value="proposal">Proposal / Quote Sent</option>
+              <option value="won">Won / Deal Closed</option>
+              <option value="disqualified">Disqualified / Junk</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Scope Details -->
+      <div class="drawer-card">
+        <div class="drawer-card-title"><i class="fa-solid fa-laptop-code"></i> Mobile App Scope & Budget</div>
+        <div class="grid-2col">
+          <div>
+            <span class="info-label">App Architecture:</span>
+            <div class="info-val" id="drawerAppType">Cross-Platform (Flutter)</div>
+          </div>
+          <div>
+            <span class="info-label">Estimated Budget:</span>
+            <div class="info-val" id="drawerBudget" style="color: #027a48;">$15,000 - $22,000</div>
+          </div>
+          <div>
+            <span class="info-label">Channel Source:</span>
+            <div class="info-val" id="drawerSource">Meta Ads</div>
+          </div>
+          <div>
+            <span class="info-label">Intent Score:</span>
+            <div class="info-val" id="drawerQuality">94% High Intent</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ad Tracking Details -->
+      <div class="drawer-card">
+        <div class="drawer-card-title"><i class="fa-solid fa-satellite-dish"></i> Ad Conversion Feedback Loop</div>
+        <div id="drawerAdDetails" style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Assignment -->
+      <div class="drawer-card">
+        <div class="drawer-card-title"><i class="fa-solid fa-user-tag"></i> Lead Assignment</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
+          <span>Assigned to: <strong id="drawerAssignedTo">Ali (Senior Agent)</strong></span>
+          <select id="drawerReassignSelect" class="clean-input" style="padding: 0.3rem 0.5rem;" onchange="reassignLead(this.value)">
+            <option value="">Reassign lead...</option>
+            <option value="Ali (Senior Agent)">Ali (Senior Agent)</option>
+            <option value="Sara (Sales Lead)">Sara (Sales Lead)</option>
+            <option value="Hamza (App Consultant)">Hamza (App Consultant)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Call Logs -->
+      <div class="drawer-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+          <div class="drawer-card-title" style="margin-bottom: 0;"><i class="fa-solid fa-phone-volume"></i> Call Logs & Notes</div>
+          <button class="btn btn-xs btn-white" onclick="toggleAddCallForm()">+ Add Call Note</button>
+        </div>
+
+        <div id="addCallForm" style="display: none; background: #f8f9fb; border: 1px solid var(--border-light); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem; flex-direction: column; gap: 0.5rem;">
+          <select id="callOutcomeSelect" class="clean-input">
+            <option value="Connected - Scope Discussed">Connected - Scope Discussed</option>
+            <option value="Connected - Price Objection">Connected - Price Objection</option>
+            <option value="Connected - Figma Received">Connected - Figma Received</option>
+            <option value="Callback Scheduled">Callback Scheduled</option>
+            <option value="No Answer / Left WhatsApp">No Answer / Left WhatsApp</option>
+            <option value="Wrong Number / Junk">Wrong Number / Junk</option>
+          </select>
+          <textarea id="callNoteText" class="clean-input" placeholder="Call discussion notes, client requirements..." rows="2"></textarea>
+          <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button class="btn btn-xs btn-primary" onclick="submitCallLog()">Save Note</button>
+            <button class="btn btn-xs btn-white" onclick="toggleAddCallForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div id="drawerCallLogs" style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Reminders -->
+      <div class="drawer-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+          <div class="drawer-card-title" style="margin-bottom: 0;"><i class="fa-solid fa-bell"></i> Reminders & Follow-ups</div>
+          <button class="btn btn-xs btn-white" onclick="toggleAddReminderForm()">+ Add Reminder</button>
+        </div>
+
+        <div id="addReminderForm" style="display: none; background: #f8f9fb; border: 1px solid var(--border-light); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem; flex-direction: column; gap: 0.5rem;">
+          <input type="text" id="reminderTitleInput" class="clean-input" placeholder="e.g. Send Flutter milestone quote">
+          <input type="text" id="reminderDueInput" class="clean-input" placeholder="e.g. Tomorrow 03:00 PM">
+          <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button class="btn btn-xs btn-primary" onclick="submitReminder()">Schedule</button>
+            <button class="btn btn-xs btn-white" onclick="toggleAddReminderForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div id="drawerReminders" style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MODAL: ADD LEAD ================= -->
+  <div class="modal-overlay" id="newLeadModal">
+    <div class="clean-modal">
+      <div class="modal-header-row">
+        <div class="modal-title-text">
+          <i class="fa-solid fa-user-plus" style="color: #4f46e5;"></i>
+          <span>Add Inbound Mobile App Lead</span>
+        </div>
+        <button class="drawer-close-btn" onclick="closeModal('newLeadModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="newLeadForm" onsubmit="handleNewLeadSubmit(event)">
+        <div class="modal-body-area">
+          <div class="form-row-2col">
+            <div class="form-field">
+              <label>Client Name *</label>
+              <input type="text" id="newLeadName" required class="clean-input" placeholder="e.g. Usman Ghani">
+            </div>
+            <div class="form-field">
+              <label>Phone Number *</label>
+              <input type="text" id="newLeadPhone" required class="clean-input" placeholder="e.g. +92 300 1234567">
+            </div>
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-field">
+              <label>Email Address</label>
+              <input type="email" id="newLeadEmail" class="clean-input" placeholder="e.g. usman@startup.com">
+            </div>
+            <div class="form-field">
+              <label>Company / Project Name</label>
+              <input type="text" id="newLeadCompany" class="clean-input" placeholder="e.g. SwiftPay Wallet">
+            </div>
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-field">
+              <label>Channel Source *</label>
+              <select id="newLeadSource" class="clean-input" required>
+                <option value="Website Form">Website Form (Inbound)</option>
+                <option value="Meta Ads">Meta Lead Ads</option>
+                <option value="Google Ads">Google Ads (Search/PMax)</option>
+                <option value="Referral / Direct">Direct Referral</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>App Development Budget *</label>
+              <select id="newLeadBudget" class="clean-input" required>
+                <option value="$15,000 - $25,000">$15,000 - $25,000 (High-Ticket)</option>
+                <option value="$10,000 - $15,000">$10,000 - $15,000 (Standard)</option>
+                <option value="$5,000 - $10,000">$5,000 - $10,000 (Starter MVP)</option>
+                <option value="Under $3,000 / Low Budget">Under $3,000 / Low Budget</option>
+                <option value="500 PKR / Free (Test Junk)">500 PKR / Free (Test Junk Filter)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Mobile App Platform & Scope *</label>
+            <input type="text" id="newLeadAppType" required class="clean-input" placeholder="e.g. Cross-Platform Flutter App for E-Commerce with Admin Panel">
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-field">
+              <label>Google Click ID (gclid)</label>
+              <input type="text" id="newLeadGclid" class="clean-input" placeholder="Cj0KCQjwm5e5BhCBARIsA...">
+            </div>
+            <div class="form-field">
+              <label>Campaign / Ad Set</label>
+              <input type="text" id="newLeadCampaign" class="clean-input" placeholder="e.g. US_Mobile_App_Founders">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-row">
+          <button type="button" class="btn btn-white" onclick="closeModal('newLeadModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Ingest Lead & Run Quality Engine</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CAPI & GOOGLE INTEGRATIONS ================= -->
+  <div class="modal-overlay" id="integrationsModal">
+    <div class="clean-modal modal-lg">
+      <div class="modal-header-row">
+        <div class="modal-title-text">
+          <i class="fa-solid fa-satellite-dish" style="color: #6366f1;"></i>
+          <span>Meta Pixel + CAPI (3 Ad Accounts) & Google Offline API</span>
+        </div>
+        <button class="drawer-close-btn" onclick="closeModal('integrationsModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body-area">
+        <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 0.85rem; font-size: 0.82rem; color: #3730a3; margin-bottom: 1.25rem;">
+          <strong>Architecture Explanation:</strong> Jab lead "Qualified" ya "Deal Won" hoti hai, CRM automatically Meta ke 3 Ad Accounts aur Google Ads Offline Conversion API ko conversion data bhejta hai. Lekin agar lead "Junk" ho toh system conversion signal block kar deta hai taake ad algorithm kharab audience par train na ho.
+        </div>
+
+        <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.65rem;">
+          <i class="fa-brands fa-meta" style="color: #4f46e5;"></i> Meta Conversions API (CAPI v19.0) Configuration
+        </h4>
+        <div id="metaAccountsList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+          <!-- Populated by JS -->
+        </div>
+
+        <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin: 1.25rem 0 0.65rem;">
+          <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google Ads Enhanced & Offline Conversions
+        </h4>
+        <div id="googleAdsConfigCard" style="background: #f8f9fb; border: 1px solid var(--border-light); padding: 1rem; border-radius: 8px; font-size: 0.82rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="modal-footer-row">
+        <button type="button" class="btn btn-primary" onclick="closeModal('integrationsModal')">Close Console</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
